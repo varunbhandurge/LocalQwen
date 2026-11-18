@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#3b82f6">
+<link rel="manifest" href="/pwa-manifest.json">
+<title>BA-Account Swarm -- Mission Control</title><link rel="stylesheet" href="/ui/main.css"></head>
+<body><div class="nav"><h1>&#x1F4E6; BA-Account Swarm</h1>
+<span id="health-badge" class="badge">&#x2705; OK</span></div><div id="main">
+
+  <section class="card"><div class="card-hd"><h2>&#x1F916; Swarm Run</h2></div>
+    <form id="swarm-form"><textarea id="query-input" rows="3" placeholder="E.g. Search Zoho for contacts in Chicago, then create a JIRA ticket about it..."></textarea>
+      <button class="btn-primary" type="submit">&#x1F680; Run</button></form></section>
+
+  <div id="swarm-result"></div>
+
+  <section class="card"><div class="card-hd"><h2>&#x23F3; HITL Approvals <span id="hitl-count">(0)</span></h2></div>
+    <div id="hitl-list"><em>No pending approvals.</em></div></section>
+
+  <section class="card"><div class="card-hd"><h2>&#x1F4AC; Chat</h2></div>
+    <div id="chat-box"></div>
+    <form id="chat-form"><input id="chat-input" type="text" placeholder="Message the swarm..." style="flex:1">
+      <button class="btn-primary" type="submit">&#x27A4;</button></form></section>
+
+  <section class="card"><div class="card-hd"><h2>&#x1F4CA; Audit Log</h2><button id="refresh-audit" class="btn-sm">Refresh</button></div>
+    <div id="audit-log"></div></section>
+</div><script src="/ui/app.js"></script></body></html>

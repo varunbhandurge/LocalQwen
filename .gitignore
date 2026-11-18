@@ -1,0 +1,23 @@
+# Virtual environment
+venv/
+.venv/
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment
+.env
+
+# IDE.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+*.egg-info/
+dist/
+build/
