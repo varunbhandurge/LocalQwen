@@ -9,11 +9,8 @@ import time
 from pathlib import Path
 from typing import Any
 
-from fastapi import (
-    FastAPI, WebSocket, WebSocketDisconnect,
-    JSONResponse, HTMLResponse, PlainTextResponse,
-)
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTMLResponse, PlainTextResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 # --------------------------------------------------------------------------- #
