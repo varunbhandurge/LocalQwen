@@ -9,8 +9,8 @@ import time
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTMLResponse, PlainTextResponse
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
 # --------------------------------------------------------------------------- #
@@ -65,7 +65,7 @@ def _bootstrap():
 # HTTP routes                                                                 #
 # --------------------------------------------------------------------------- #
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def dashboard():
     p = _UI_DIR / "index.html"
     if p.exists():
@@ -92,7 +92,7 @@ async def serve_ui(filename: str):
     return JSONResponse(status_code=404, content={"error": "not found"})
 
 
-@app.get("/pwa-manifest.json", media_type="application/json")
+@app.get("/pwa-manifest.json")
 def pwa_manifest():
     m = {
         "name": "BA Account Swarm",
@@ -104,10 +104,10 @@ def pwa_manifest():
     return PlainTextResponse(json.dumps(m, indent=2), media_type="application/json")
 
 
-@app.post("/swarm/run", response_class=JSONResponse)
+@app.post("/swarm/run")
 async def swarm_run(req: SwarmRunReq):
     """Kick off a swarm session and wait for completion."""
-    from ..swarm.engine import run_swarm as _rs
+    from .engine import run_swarm as _rs
 
     result = await _rs(user_query=req.query, caller=req.caller)
     return JSONResponse(result)
@@ -116,7 +116,7 @@ async def swarm_run(req: SwarmRunReq):
 @app.get("/hitl/pending")
 async def hitl_pending(caller: str = "web"):
     """Return pending Human-in-the-Loop requests for a given caller."""
-    from ..app.db import hitl_get_pending
+    from .db import hitl_get_pending
 
     pending = hitl_get_pending(caller)
     return JSONResponse({
@@ -132,10 +132,10 @@ async def hitl_pending(caller: str = "web"):
     })
 
 
-@app.post("/hitl/action", response_class=JSONResponse)
+@app.post("/hitl/action")
 async def hitl_action(req: HitlActionReq):
     """Record a HITL approve/deny action."""
-    from ..app.db import get_db_path, hitl_update
+    from .db import get_db_path, hitl_update
 
     status = "approved" if req.action == "approve" else "denied"
 
@@ -146,10 +146,10 @@ async def hitl_action(req: HitlActionReq):
     return JSONResponse({"ok": False, "error": "ID not found"}, status_code=404)
 
 
-@app.post("/context/save", response_class=JSONResponse)
+@app.post("/context/save")
 async def context_save(req: ContextSaveReq):
     """Persist key-value context for a caller."""
-    from ..app.db import save_context
+    from .db import save_context
 
     try:
         save_context(req.caller, req.key, req.value)
@@ -162,7 +162,7 @@ async def context_save(req: ContextSaveReq):
 @app.get("/context/get")
 def context_get(caller: str = "web", key: str = ""):
     """Retrieve stored context for a caller and key."""
-    from ..app.db import get_context
+    from .db import get_context
 
     value = get_context(caller, key)
     return JSONResponse({"key": key, "value": value})
@@ -171,7 +171,7 @@ def context_get(caller: str = "web", key: str = ""):
 @app.get("/audit/{session_id}")
 async def audit_log(session_id: str):
     """Return the full swarm execution trace for a session."""
-    from ..app.db import get_audit_logs
+    from .db import get_audit_logs
 
     events = get_audit_logs(session_id, limit=100)
     return JSONResponse({"session_id": session_id, "events": events})
@@ -180,7 +180,7 @@ async def audit_log(session_id: str):
 @app.get("/health")
 def health_check():
     """Minimal liveness probe."""
-    from ..app.db import get_db_path
+    from .db import get_db_path
 
     db = get_db_path()
     status = "sqlite-wal" if db.exists() else "no-db"
@@ -216,7 +216,7 @@ async def websocket_chat(websocket: WebSocket):
 
             # --- HITL quick-action --------------------------------------------------
             if msg_type == "hitl_action":
-                from ..app.db import get_db_path, hitl_update as _hud
+                from .db import get_db_path, hitl_update as _hud
                 st = "approved" if msg.get("action") == "approve" else "denied"
                 ok = _hud(msg.get("id", ""), st, answerer=msg.get("answerer", "ws"))
                 if ok:
@@ -235,7 +235,7 @@ async def websocket_chat(websocket: WebSocket):
                 caller = msg.get("caller", "web")
                 await websocket.send_json({"type": "status", "text": "Starting swarm..."})
 
-                from ..swarm.engine import run_swarm as _rs
+                from .engine import run_swarm as _rs
 
                 task = asyncio.create_task(_rs(user_query, caller))
 
@@ -251,7 +251,7 @@ async def websocket_chat(websocket: WebSocket):
                 session_id = result.get("session_id", "")
                 result_text = result.get("result", "")
 
-                from ..app.db import get_audit_logs
+                from .db import get_audit_logs
                 events = get_audit_logs(session_id, limit=50)
 
                 await websocket.send_json({

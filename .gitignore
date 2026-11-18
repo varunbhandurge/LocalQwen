@@ -10,12 +10,16 @@ __pycache__/
 # Environment
 .env
 
-# IDE.vscode/
+# IDE
+.vscode/
 .idea/
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Database
+*.db
 
 # Build
 *.egg-info/

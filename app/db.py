@@ -98,9 +98,10 @@ CREATE TABLE IF NOT EXISTS hitl_approvals (
     requested_at  REAL NOT NULL DEFAULT (strftime('%s','now')),
     answered_at REAL,
     answerer   TEXT,
-    expires_at REAL,
-    INDEX idx_hitl_status (status)
+    expires_at REAL
 );
+
+CREATE INDEX IF NOT EXISTS idx_hitl_status ON hitl_approvals(status);
 
 CREATE TABLE IF NOT EXISTS swarm_audit_logs (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,9 +109,10 @@ CREATE TABLE IF NOT EXISTS swarm_audit_logs (
     timestamp   REAL NOT NULL DEFAULT (strftime('%s','now')),
     agent       TEXT NOT NULL,
     action      TEXT NOT NULL,
-    details     TEXT NOT NULL DEFAULT '{}',
-    INDEX idx_swarm_session (session_id)
+    details     TEXT NOT NULL DEFAULT '{}'
 );
+
+CREATE INDEX IF NOT EXISTS idx_swarm_session ON swarm_audit_logs(session_id);
 """
 
 
